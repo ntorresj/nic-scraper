@@ -63,16 +63,18 @@ end
 @domain = ARGV[0]
 @expiration_at = ARGV[1]
 
-return if @domain.nil? || @expiration_at.nil?
+return if @domain.nil?
 
 data = scraper
 
 p Time.now
 p data
 
-if available?(data)
-  message = "Nos cagaron con #{@domain} :("
-  sendmail(message)
+unless @expiration_at.nil?
+  if available?(data)
+    message = "Nos cagaron con #{@domain} :("
+    sendmail(message)
+  end
 end
 
 if notify?(data)
