@@ -66,7 +66,9 @@ end
 return if @domain.nil? || @expiration_at.nil?
 
 data = scraper
-p "#{Time.now}:  #{data}"
+
+p Time.now
+p data
 
 if available?(data)
   message = "Nos cagaron con #{@domain} :("
