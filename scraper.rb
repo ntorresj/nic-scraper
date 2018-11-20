@@ -63,10 +63,10 @@ end
 @domain = ARGV[0]
 @expiration_at = ARGV[1]
 
-return if @domain.nil?
+return if @domain.nil? || @expiration_at.nil?
 
 data = scraper
-p data
+p "#{Time.now}:  #{data}"
 
 if available?(data)
   message = "Nos cagaron con #{@domain} :("
