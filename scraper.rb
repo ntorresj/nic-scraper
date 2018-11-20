@@ -4,10 +4,10 @@ require 'byebug'
 require 'time'
 require 'mail'
 
-def scraper(domain)
-  url = "https://www.nic.cl/registry/Whois.do?d=#{domain}"
+def scraper
+  url = "https://www.nic.cl/registry/Whois.do?d=#{@domain}"
   table = search(url, '.tablabusqueda')
-  data = { domain: domain }
+  data = {}
   table.search('tr').each do |tr|
     divs = tr.search('td div')
     next if divs.count.zero?
@@ -40,25 +40,40 @@ def search(url, element)
   parse_page(url).css(element)
 end
 
-def notify(data)
-  sendmail(data) if Time.parse(data['expiration_at']) < Time.now
+def notify?(data)
+  Time.parse(data['expiration_at']) < Time.now
 end
 
-def sendmail(data)
+def sendmail(message)
   mail = Mail.new do
     from     ''
     to       ''
     subject  'Dominio liberado :)'
-    body     "Se ha liberado el dominio #{data[:domain]}"
+    body     message
   end
   mail.delivery_method :sendmail
 
   mail.deliver
 end
 
-domain = ARGV[0]
-return if domain.nil?
+def available?(data)
+  Time.parse(data['expiration_at']) != Time.parse(@expiration_at)
+end
 
-data = scraper(domain)
+@domain = ARGV[0]
+@expiration_at = ARGV[1]
+
+return if @domain.nil?
+
+data = scraper
 p data
-notify(data)
+
+if available?(data)
+  message = "Nos cagaron con #{@domain} :("
+  sendmail(message)
+end
+
+if notify?(data)
+  message = "Al fin #{@domain} está disponible :)"
+  sendmail(message)
+end
