@@ -2,6 +2,7 @@ require 'httparty'
 require 'nokogiri'
 require 'byebug'
 require 'time'
+require 'active_support/all'
 require 'mail'
 
 def scraper
@@ -41,7 +42,7 @@ def search(url, element)
 end
 
 def notify?(data)
-  Time.parse(data['expiration_at']) < Time.now
+  Time.parse(data['expiration_at']) < Time.zone.now
 end
 
 def sendmail(message)
@@ -67,7 +68,9 @@ return if @domain.nil?
 
 data = scraper
 
-p Time.now
+Time.zone = 'America/Santiago'
+
+p Time.zone.now
 p data
 
 unless @expiration_at.nil?
